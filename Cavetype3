@@ -1,0 +1,12 @@
+public class Cavetype3 extends Cave {
+	
+	public Cavetype3() {
+		this.nbLevel = 3 + (int) (Math.random() * ((6 - 3) + 1));
+		Level[] list = new Level[this.nbLevel];
+		for(int i=0; i<this.nbLevel; i++) {
+			Level tmp = new Leveltype3();
+			list[i] = tmp;
+		}
+		this.layer = list;
+	}
+}	

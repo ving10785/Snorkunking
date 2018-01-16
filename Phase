@@ -1,0 +1,17 @@
+
+public class Phase {
+
+	public double Oxygen;
+	public int Manche;
+	
+	public Phase(double vOxygen)
+	{
+		this.Oxygen = vOxygen;
+		this.Manche = 1;
+	}
+	
+	public void PerteOxygen(int Perte)
+	{
+		this.Oxygen = this.Oxygen - Perte;
+	}
+}

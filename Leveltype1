@@ -1,0 +1,10 @@
+import java.util.LinkedList;
+
+public class Leveltype1 extends Level{
+
+	public Leveltype1() {
+		LinkedList<Integer> test = new LinkedList<>();
+		test.addFirst(1 + (int) (Math.random() * ((3 - 1) + 1)));
+		this.drop = test;
+	}
+}

@@ -1,0 +1,39 @@
+import java.util.LinkedList;
+
+public class Level {
+	
+	public LinkedList<Integer> drop;
+	
+	public Level()
+	{
+		LinkedList<Integer> vide = new LinkedList<>();
+		this.drop = vide;
+	}
+	
+	public int loot()
+	{
+		int res = this.drop.getFirst();
+		this.drop.removeFirst();
+		return res;
+	}
+	
+	public void addChest(int value)
+	{
+		this.drop.addLast(value);
+	}
+	
+	public void addChesttype1()
+	{
+		this.drop.addLast(1 + (int) (Math.random() * ((3 - 1) + 1)));
+	}
+	
+	public void addChesttype2()
+	{
+		this.drop.addLast( 5 + (int) (Math.random() * ((8 - 5) + 1)));
+	}
+	
+	public void addChesttype3()
+	{
+		this.drop.addLast(10 + (int) (Math.random() * ((12 - 10) + 1)));
+	}
+}

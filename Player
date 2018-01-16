@@ -1,0 +1,88 @@
+import java.util.LinkedList;
+
+public class Player {
+	
+	public Cave[] Map;
+	public int MapPosition;
+	public int Position;
+	public boolean ajouer;
+	public LinkedList<Integer> Inventory;
+	
+	public Player(Cave[] vMap)
+	{
+		this.Map = vMap;
+		this.MapPosition = 0;
+		this.Position = 0;
+		this.ajouer = false;
+		LinkedList<Integer> inv = new LinkedList<>();
+		this.Inventory = inv;
+	}
+	
+	public void take()
+	{
+		while (!this.Map[MapPosition].layer[Position].drop.isEmpty())
+		{
+			this.Inventory.addLast(this.Map[MapPosition].layer[Position].loot());
+		}
+	}
+	
+	public void up()
+	{
+		if((this.Position==0)&&(this.MapPosition==0))
+		{
+			System.out.println("Action Impossible");
+		}
+		else
+		{
+			if((this.MapPosition==1)&&(this.Position==0))
+			{
+				this.MapPosition = 0;
+				this.Position = this.Map[0].nbLevel - 1;
+			}
+			else if((this.MapPosition==2)&&(this.Position==0))
+			{
+				this.MapPosition = 1;
+				this.Position = this.Map[1].nbLevel - 1;
+			}
+			else
+			{
+				this.Position = this.Position - 1;
+			}
+		}
+	}
+	
+	public void down()
+	{
+		if((this.Position==this.Map[2].nbLevel-1)&&(this.MapPosition==2))
+		{
+			System.out.println("Action Impossible");
+		}
+		else
+		{
+			if((this.MapPosition==1)&&(this.Position==this.Map[1].nbLevel-1))
+			{
+				this.MapPosition = 2;
+				this.Position = 0;
+			}
+			else if((this.MapPosition==0)&&(this.Position==this.Map[0].nbLevel-1))
+			{
+				this.MapPosition = 1;
+				this.Position = 0;
+			}
+			else
+			{
+				this.Position = this.Position + 1;
+			}
+		}
+	}
+	
+	public int score()
+	{
+		int res = 0;
+		for(int i=0; i<this.Inventory.size(); i++)
+		{
+			res += this.Inventory.get(i);
+		}
+		return res;
+	}
+}

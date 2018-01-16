@@ -1,0 +1,46 @@
+import java.io.*;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
+public class Sound {
+
+	public File content;
+	public Clip klip;
+	
+	public Sound(String nom)
+	throws Exception
+	{
+		this.content = new File(nom);
+		this.klip = AudioSystem.getClip();
+	}
+	
+	public void PlaySoundC()
+	throws Exception
+	{
+		klip.open(AudioSystem.getAudioInputStream(this.content));
+		klip.loop(Clip.LOOP_CONTINUOUSLY);
+	}
+	
+	public void PlaySound()
+	throws Exception
+	{
+		klip.open(AudioSystem.getAudioInputStream(this.content));
+		klip.start();
+		this.klip = AudioSystem.getClip();
+	}
+	
+	public void StopSound()
+	{
+		klip.close();
+	}
+	
+	public static void main(String[] args)
+	throws Exception
+	{
+		Sound selection = new Sound("select.wav");
+		Sound test = new Sound("dearlybeloved.wav");
+		test.PlaySoundC();
+		selection.PlaySound();
+		selection.PlaySound();
+	}
+}

@@ -1,0 +1,87 @@
+public class Cave {
+	
+	public int nbLevel;
+	public Level[] layer;
+	
+	public void nbCavetype1(int n)
+	{
+		this.nbLevel = n;
+		Level[] list = new Level[this.nbLevel];
+		list[0] = new Level();
+		for (int i=1; i<this.nbLevel; i++)
+		{
+			Level tmp = new Leveltype1();
+			list[i] = tmp;
+		}
+		this.layer = list;
+	}
+	
+	public void nbCavetype2(int n)
+	{
+		this.nbLevel = n;
+		Level[] list = new Level[this.nbLevel];
+		for (int i=0; i<this.nbLevel; i++)
+		{
+			Level tmp = new Leveltype2();
+			list[i] = tmp;
+		}
+		this.layer = list;
+	}
+	
+	public void nbCavetype3(int n)
+	{
+		this.nbLevel = n;
+		Level[] list = new Level[this.nbLevel];
+		for (int i=0; i<this.nbLevel; i++)
+		{
+			Level tmp = new Leveltype3();
+			list[i] = tmp;
+		}
+		this.layer = list;
+	}
+		
+	public Cave redefineCavetype1()
+	{
+		Cave tmp = new Cave();
+		int n = 1;
+		for (int i=1; i<this.layer.length; i++)
+		{
+			if (!this.layer[i].drop.isEmpty())
+			{
+				n += 1;
+			}
+		}
+		tmp.nbCavetype1(n);
+		return tmp;
+	}
+	
+	public Cave redefineCavetype2()
+	{
+		Cave tmp = new Cave();
+		int n = 0;
+		for (Level level : this.layer)
+		{
+			if (!level.drop.isEmpty())
+			{
+				n += 1;
+			}
+		}
+		tmp.nbCavetype2(n);
+		return tmp;
+	}
+	
+	public Cave redefineCavetype3()
+	{
+		Cave tmp = new Cave();
+		int n = 0;
+		for (Level level : this.layer)
+		{
+			if (!level.drop.isEmpty())
+			{
+				n += 1;
+			}
+		}
+		tmp.nbCavetype3(n);
+		return tmp;
+	}
+}

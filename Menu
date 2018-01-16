@@ -1,0 +1,438 @@
+import java.awt.event.KeyEvent;
+import edu.princeton.cs.introcs.StdDraw;
+import java.util.List;
+import java.util.ArrayList;
+
+public class Menu {
+    public final static double WIN_WIDTH = 1080.0;
+    public final static double WIN_HEIGHT = 720.0;
+    public final static int FPS = 60;
+    static Player joueur1;
+    static Player joueur2;
+    static int turn = 1;
+    static Cave[] carte = new Cave[3];
+    static Phase phase;
+    static double TotalLevel;
+    static List<Double> placement = new ArrayList<>();
+    
+    public static void main(String[] args)
+    	throws Exception
+    	{
+    	// Fichiers audios
+    	Sound selection = new Sound("select.wav");
+		Sound test = new Sound("theme.wav");
+        test.PlaySoundC();
+        
+        // Mapping
+        carte[0] = new Cavetype1();
+        carte[1] = new Cavetype2();
+        carte[2] = new Cavetype3();
+        for (Cave cave : carte)
+        {
+        	TotalLevel += cave.nbLevel;
+        }
+        phase = new Phase(2*TotalLevel);
+      
+        // Players
+        joueur1 = new Player(carte);
+        joueur2 = new Player(carte);
+        
+		// Dessin
+    	StdDraw.setCanvasSize((int) WIN_WIDTH,(int) WIN_HEIGHT);
+        StdDraw.setXscale(0, WIN_WIDTH);
+        StdDraw.setYscale(0, WIN_HEIGHT);
+        StdDraw.setPenColor(StdDraw.WHITE);
+        int etat = 0;
+        double x = -0.10*WIN_WIDTH;
+        double y =  1.10*WIN_WIDTH;
+        
+        while(true){
+            StdDraw.clear();
+            x = x + WIN_WIDTH/500;
+            y = y - WIN_WIDTH/400;
+            if(x>1.25*WIN_WIDTH)
+            {
+            	x = -0.10*WIN_WIDTH;
+            }
+            if(y<-0.25*WIN_WIDTH) 
+            {
+            	y =  1.10*WIN_WIDTH;
+            }
+            if (StdDraw.isKeyPressed(KeyEvent.VK_LEFT)&&etat==1) {
+            	etat = 0;
+            	selection.PlaySound();
+            }
+            if (StdDraw.isKeyPressed(KeyEvent.VK_RIGHT)&&etat==0) {
+            	etat = 1;
+            	selection.PlaySound();
+            }
+            if (StdDraw.isKeyPressed(KeyEvent.VK_ENTER)&&etat==0) {
+            	etat = 2;
+            	selection.PlaySound();
+            }
+            if (StdDraw.isKeyPressed(KeyEvent.VK_ENTER)&&etat==1) {
+            	etat = 3;
+            	selection.PlaySound();
+            }
+            if (etat==0) { // Menu: Curseur sur 1Player
+            	StdDraw.picture(WIN_WIDTH/2,WIN_HEIGHT/2,"fondmarin.png",WIN_WIDTH,WIN_HEIGHT);
+                StdDraw.picture(WIN_WIDTH/2, 3*WIN_HEIGHT/4, "Title.png",WIN_WIDTH/2.5,WIN_HEIGHT/2.5);
+            	StdDraw.picture(WIN_WIDTH/4,WIN_HEIGHT/4,"1PlayerSelected.png",WIN_WIDTH/5,WIN_HEIGHT/5); 
+            	StdDraw.picture(3*WIN_WIDTH/4,WIN_HEIGHT/4,"2Players.png",WIN_WIDTH/5,WIN_HEIGHT/5); 
+            	StdDraw.picture(x,2*WIN_HEIGHT/3, "poissonrougered.gif",WIN_WIDTH/10,WIN_HEIGHT/10);
+            	StdDraw.picture(y,3*WIN_HEIGHT/8, "poissonrougered.gif",WIN_WIDTH/10,WIN_HEIGHT/10);
+            }
+            if (etat==1) { // Menu: Curseur sur 2Players
+            	StdDraw.picture(WIN_WIDTH/2,WIN_HEIGHT/2,"fondmarin.png",WIN_WIDTH,WIN_HEIGHT);
+                StdDraw.picture(WIN_WIDTH/2, 3*WIN_HEIGHT/4, "Title.png",WIN_WIDTH/2.5,WIN_HEIGHT/2.5);
+            	StdDraw.picture(WIN_WIDTH/4,WIN_HEIGHT/4,"1Player.png",WIN_WIDTH/5,WIN_HEIGHT/5); 
+            	StdDraw.picture(3*WIN_WIDTH/4,WIN_HEIGHT/4,"2PlayersSelected.png",WIN_WIDTH/5,WIN_HEIGHT/5); 
+            	StdDraw.picture(x,2*WIN_HEIGHT/3, "poissonrougered.gif",WIN_WIDTH/10,WIN_HEIGHT/10);
+            	StdDraw.picture(y,3*WIN_HEIGHT/8, "poissonrougered.gif",WIN_WIDTH/10,WIN_HEIGHT/10);
+            }
+            if (etat==2) { // Jeu: 1 joueur1
+            	test.StopSound();
+            	if (phase.Manche<=3)
+            	{
+            		ecran1joueur();
+            	}
+            }
+            if (etat==3) // Jeu: 2 joueur1s
+            {
+           		test.StopSound();
+           		if (phase.Manche<=3)
+           		{
+           			ecran2joueurs();
+           		}
+           		else 
+           		{
+           	       	StdDraw.picture(WIN_WIDTH/2, WIN_HEIGHT/2, "fondjeu.png",WIN_WIDTH, WIN_HEIGHT);
+           	       	StdDraw.setPenColor(StdDraw.YELLOW);
+           	       	StdDraw.filledRectangle(WIN_WIDTH/2, WIN_HEIGHT/2, WIN_WIDTH/6, 0.25*WIN_HEIGHT);
+           	       	StdDraw.setPenColor(StdDraw.BLACK);
+           	       	StdDraw.text(WIN_WIDTH/2, 0.7*WIN_HEIGHT, "FIN DE LA PARTIE");
+           	       	if(joueur1.score()>joueur2.score())
+           	       	{
+           	       		StdDraw.text(WIN_WIDTH/2, 0.55*WIN_HEIGHT, "Joueur 1:    " + joueur1.score());
+           	       		StdDraw.text(WIN_WIDTH/2, 0.45*WIN_HEIGHT, "Joueur 2:    " + joueur2.score());
+           	       		StdDraw.text(0.6*WIN_WIDTH, 0.55*WIN_HEIGHT, "GAGNANT");
+           	       	}
+           	       	else
+           	       	{
+           	       	StdDraw.text(WIN_WIDTH/2, 0.55*WIN_HEIGHT, "Joueur 2:    " + joueur2.score());
+       	       		StdDraw.text(WIN_WIDTH/2, 0.45*WIN_HEIGHT, "Joueur 1:    " + joueur1.score());
+       	       		StdDraw.text(0.6*WIN_WIDTH, 0.55*WIN_HEIGHT, "GAGNANT");
+           	       	}
+           		}
+            }
+            StdDraw.show(1000/FPS);
+        }
+    }
+    
+    
+    public static void ecran1joueur()
+    throws Exception {
+    	double[] rectzone1 = new double[carte[0].nbLevel];
+        double tmp = 7.5*WIN_HEIGHT/10;
+        for (int i=0; i<rectzone1.length; i++)
+        {
+        	rectzone1[i] = tmp;
+        	tmp -= 6*WIN_HEIGHT/(10*TotalLevel);
+        }
+        double[] rectzone2 = new double[carte[1].nbLevel];
+    	tmp -= 6*WIN_HEIGHT/(10*TotalLevel);
+        for (int i=0; i<rectzone2.length; i++)
+        {
+        	rectzone2[i] = tmp;
+        	tmp -= 6*WIN_HEIGHT/(10*TotalLevel);
+        }
+        double[] rectzone3 = new double[carte[2].nbLevel];
+    	tmp -= 6*WIN_HEIGHT/(10*TotalLevel);
+    	for (int i=0; i<rectzone3.length; i++)
+    	{
+    		rectzone3[i] = tmp;
+        	tmp -= 6*WIN_HEIGHT/(10*TotalLevel);
+    	}
+       	StdDraw.picture(WIN_WIDTH/2, WIN_HEIGHT/2, "fondjeu.png",WIN_WIDTH, WIN_HEIGHT);
+       	StdDraw.setPenColor(StdDraw.ORANGE);
+       	StdDraw.filledRectangle(WIN_WIDTH/2, WIN_HEIGHT, WIN_WIDTH/2, WIN_HEIGHT/10);
+       	StdDraw.setPenColor(StdDraw.BLACK);
+       	StdDraw.text(WIN_WIDTH/6, 9.7*WIN_HEIGHT/10, "joueur1 1: " + joueur1.score());
+       	StdDraw.text(WIN_WIDTH/6, 9.4*WIN_HEIGHT/10, "Coffres ramassés: " + joueur1.Inventory.size());
+       	StdDraw.text(5*WIN_WIDTH/6, 9.7*WIN_HEIGHT/10, "Ordinateur: " + joueur2.score());
+       	StdDraw.text(5*WIN_WIDTH/6, 9.4*WIN_HEIGHT/10, "Coffres ramassés: " + joueur2.Inventory.size());
+       	StdDraw.setPenRadius(0.01);
+       	StdDraw.rectangle(WIN_WIDTH/2, 0.95*WIN_HEIGHT, 0.25*WIN_WIDTH, 0.04*WIN_HEIGHT);
+       	StdDraw.setPenColor(StdDraw.WHITE); 
+       	StdDraw.setPenRadius();
+       	StdDraw.filledRectangle(WIN_WIDTH/2, 0.95*WIN_HEIGHT, 0.249*WIN_WIDTH, 0.039*WIN_HEIGHT);
+       	StdDraw.setPenColor(StdDraw.CYAN);
+       	StdDraw.filledRectangle(WIN_WIDTH/2, 0.95*WIN_HEIGHT, 0.249*WIN_WIDTH, 0.039*WIN_HEIGHT);
+       	for (int i=0; i<carte[0].nbLevel;i++)
+       	{	
+       		StdDraw.rectangle(WIN_WIDTH/2, rectzone1[i], 8*WIN_WIDTH/(2*10), WIN_HEIGHT/(2*10*carte[0].nbLevel));
+        }
+        StdDraw.setPenColor(StdDraw.YELLOW);
+       	for (int i=0; i<carte[1].nbLevel; i++)
+       	{
+       		StdDraw.rectangle(WIN_WIDTH/2, rectzone2[i], 8*WIN_WIDTH/(2*10), WIN_HEIGHT/(2*10*carte[0].nbLevel));
+       	}
+       	StdDraw.setPenColor(StdDraw.RED);
+       	for (int i=0; i<carte[2].nbLevel; i++)
+       	{
+       		StdDraw.rectangle(WIN_WIDTH/2, rectzone3[i], 8*WIN_WIDTH/(2*10), WIN_HEIGHT/(2*10*carte[0].nbLevel));
+       	}
+       	if (joueur1.MapPosition==0)
+       	{
+       		StdDraw.picture(WIN_WIDTH/4, rectzone1[joueur1.Position], "plongeur.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       	}
+        else if (joueur1.MapPosition==1)
+       	{
+       		StdDraw.picture(WIN_WIDTH/4, rectzone2[joueur1.Position], "plongeur.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       	}
+       	else
+       	{
+       		StdDraw.picture(WIN_WIDTH/4, rectzone3[joueur1.Position], "plongeur.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       	}
+       	Thread.sleep(100);
+       	if ((joueur1.MapPosition<joueur2.MapPosition) && (joueur1.ajouer==false))
+       	{
+	       	if (StdDraw.isKeyPressed(KeyEvent.VK_DOWN))
+	         	{
+	       		joueur1.down();
+           		phase.PerteOxygen(1+joueur1.Inventory.size());
+	       		turn += 1;
+	           	}
+	       	if (StdDraw.isKeyPressed(KeyEvent.VK_UP))
+	           	{
+         		joueur1.up();
+          		phase.PerteOxygen(1+joueur1.Inventory.size());
+           		turn += 1;
+	        	}
+	       	if ((StdDraw.isKeyPressed(KeyEvent.VK_SPACE)) && (!carte[joueur1.MapPosition].layer[joueur1.Position].drop.isEmpty()))
+	           	{
+	           	joueur1.take();
+	           	phase.PerteOxygen(1);
+	           	turn += 1;
+	           	}
+       	}
+       	else if ((joueur1.MapPosition>joueur2.MapPosition) && (joueur2.ajouer==false))
+       	{
+        	
+       	}
+    }
+    
+    public static void ecran2joueurs()
+    throws Exception {
+    	double pourcentageBarre = phase.Oxygen/(2*TotalLevel);
+    	if (placement.isEmpty())
+    	{
+    		placement.add(WIN_WIDTH/2);
+    	}
+    	if (pourcentageBarre<=0)
+    	{
+    		phase.Manche += 1;
+    		carte[0] = carte[0].redefineCavetype1();
+    		carte[1] = carte[1].redefineCavetype2();
+    		carte[2] = carte[2].redefineCavetype3();
+    		TotalLevel = 0;
+    		for (Cave cave : carte)
+    		{
+    			TotalLevel += cave.nbLevel;
+    		}
+    		phase.Oxygen = 2*TotalLevel;
+    		pourcentageBarre = 1;
+    		if ((joueur1.MapPosition==0) && (joueur1.Position==0))  // Le joueur1 est à la surface
+    		{
+    			Player transfert = new Player(carte);
+    			transfert.Inventory = joueur1.Inventory;
+    			joueur1 = transfert;
+    		}
+    		else {        											// Le joueur1 coule
+    			for (int value : joueur1.Inventory)
+    			{
+    				carte[2].layer[(carte[2].layer.length)-1].addChest(value);
+    			}
+    			joueur1 = new Player(carte);
+    		}
+    		if ((joueur2.MapPosition==0) && (joueur2.Position==0))     // Le joueur2 esst à la surface
+    		{
+    			Player transfert = new Player(carte);
+    			transfert.Inventory = joueur2.Inventory;
+    			joueur2 = transfert;
+    		}
+    		else {													// Le joueur2 coûle
+    			for (int value : joueur2.Inventory)
+    			{
+    				carte[2].layer[carte[2].layer.length-1].addChest(value);
+    			}
+    			joueur2 = new Player(carte);
+    		}
+    		for (int i=1; i<carte[2].layer[carte[2].nbLevel-1].drop.size(); i++)
+        	{
+        		placement.add(3*WIN_WIDTH/4 - Math.random()*WIN_WIDTH/2); 
+        	}
+    	}
+    	double[] rectzone1 = new double[carte[0].nbLevel];
+        double tmp = 7.5*WIN_HEIGHT/10;
+        for (int i=0; i<rectzone1.length; i++)
+        {
+        	rectzone1[i] = tmp;
+        	tmp -= 6*WIN_HEIGHT/(10*TotalLevel);
+        }
+        double[] rectzone2 = new double[carte[1].nbLevel];
+    	tmp -= 6*WIN_HEIGHT/(10*TotalLevel);
+        for (int i=0; i<rectzone2.length; i++)
+        {
+        	rectzone2[i] = tmp;
+        	tmp -= 6*WIN_HEIGHT/(10*TotalLevel);
+        }
+        double[] rectzone3 = new double[carte[2].nbLevel];
+    	tmp -= 6*WIN_HEIGHT/(10*TotalLevel);
+    	for (int i=0; i<rectzone3.length; i++)
+    	{
+    		rectzone3[i] = tmp;
+        	tmp -= 6*WIN_HEIGHT/(10*TotalLevel);
+    	}
+       	StdDraw.picture(WIN_WIDTH/2, WIN_HEIGHT/2, "fondjeu.png",WIN_WIDTH, WIN_HEIGHT);
+       	StdDraw.setPenColor(StdDraw.ORANGE);
+       	StdDraw.filledRectangle(WIN_WIDTH/2, WIN_HEIGHT, WIN_WIDTH/2, WIN_HEIGHT/10);
+      	StdDraw.setPenColor(StdDraw.WHITE); 
+      	StdDraw.filledRectangle(WIN_WIDTH/2, 0.95*WIN_HEIGHT, 0.249*WIN_WIDTH, 0.039*WIN_HEIGHT);
+       	StdDraw.setPenColor(StdDraw.CYAN);
+       	StdDraw.filledRectangle(WIN_WIDTH/2-(1-pourcentageBarre)*(0.249*WIN_WIDTH), 0.95*WIN_HEIGHT, pourcentageBarre*0.249*WIN_WIDTH, 0.039*WIN_HEIGHT);
+    	StdDraw.setPenColor(StdDraw.BLACK);
+       	StdDraw.setPenRadius(0.01);
+       	StdDraw.rectangle(WIN_WIDTH/2, 0.95*WIN_HEIGHT, 0.25*WIN_WIDTH, 0.04*WIN_HEIGHT);
+       	StdDraw.setPenRadius();
+       	StdDraw.text(WIN_WIDTH/2, 0.88*WIN_HEIGHT, "Manche " + phase.Manche);
+       	StdDraw.text(WIN_WIDTH/6, 9.7*WIN_HEIGHT/10, "Joueur 1: " + joueur1.score());
+       	StdDraw.text(WIN_WIDTH/6, 9.4*WIN_HEIGHT/10, "Coffres ramassés: " + joueur1.Inventory.size());
+       	StdDraw.text(5*WIN_WIDTH/6, 9.7*WIN_HEIGHT/10, "Joueur 2: " + joueur2.score());
+       	StdDraw.text(5*WIN_WIDTH/6, 9.4*WIN_HEIGHT/10, "Coffres ramassés: " + joueur2.Inventory.size());
+      	StdDraw.text(WIN_WIDTH/2, 0.95*WIN_HEIGHT, (int) phase.Oxygen + " / " +  (int)(2*TotalLevel));
+       	StdDraw.setPenColor(StdDraw.BLUE);
+    	for (int i=0; i<carte[0].nbLevel;i++)
+       	{	
+       		StdDraw.rectangle(WIN_WIDTH/2, rectzone1[i], 8*WIN_WIDTH/(2*10), WIN_HEIGHT/(2*10*TotalLevel));
+       		if (!carte[0].layer[i].drop.isEmpty())
+       		{
+       			StdDraw.picture(WIN_WIDTH/2, rectzone1[i], "treasure.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       		}
+        }
+        StdDraw.setPenColor(StdDraw.YELLOW);
+       	for (int i=0; i<carte[1].nbLevel; i++)
+       	{
+       		StdDraw.rectangle(WIN_WIDTH/2, rectzone2[i], 8*WIN_WIDTH/(2*10), WIN_HEIGHT/(2*10*TotalLevel));
+       		if (!carte[1].layer[i].drop.isEmpty())
+       		{
+       			StdDraw.picture(WIN_WIDTH/2, rectzone2[i], "treasure.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       		}
+       	}
+       	StdDraw.setPenColor(StdDraw.RED);
+       	for (int i=0; i<carte[2].nbLevel-1; i++)
+       	{
+       		StdDraw.rectangle(WIN_WIDTH/2, rectzone3[i], 8*WIN_WIDTH/(2*10), WIN_HEIGHT/(2*10*TotalLevel));
+       		if (!carte[2].layer[i].drop.isEmpty())
+       		{
+       			StdDraw.picture(WIN_WIDTH/2, rectzone3[i], "treasure.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       		}
+       	}
+   		StdDraw.rectangle(WIN_WIDTH/2, rectzone3[carte[2].nbLevel-1], 8*WIN_WIDTH/(2*10), WIN_HEIGHT/(2*10*TotalLevel));
+   		for (int i=0; i<carte[2].layer[carte[2].nbLevel-1].drop.size(); i++)
+   		{
+   			StdDraw.picture(placement.get(i), rectzone3[carte[2].nbLevel-1], "treasure.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+   		}
+       	if (joueur1.MapPosition==0)
+       	{
+       		StdDraw.picture(WIN_WIDTH/4, rectzone1[joueur1.Position], "plongeur.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       	}
+        else if (joueur1.MapPosition==1)
+       	{
+       		StdDraw.picture(WIN_WIDTH/4, rectzone2[joueur1.Position], "plongeur.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       	}
+       	else
+       	{
+       		StdDraw.picture(WIN_WIDTH/4, rectzone3[joueur1.Position], "plongeur.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       	}
+       	if (joueur2.MapPosition==0)
+       	{
+       		StdDraw.picture(3*WIN_WIDTH/4, rectzone1[joueur2.Position], "plongeur.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       	}
+        else if (joueur2.MapPosition==1)
+       	{
+       		StdDraw.picture(3*WIN_WIDTH/4, rectzone2[joueur2.Position], "plongeur.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       	}
+       	else
+       	{
+       		StdDraw.picture(3*WIN_WIDTH/4, rectzone3[joueur2.Position], "plongeur.png", WIN_WIDTH/80, WIN_HEIGHT/80);
+       	}
+       	Thread.sleep(100);
+       	if ((joueur1.MapPosition>joueur2.MapPosition) && (joueur1.ajouer==false) && (joueur2.ajouer==false))
+       	{
+       		action(joueur1);
+       	}
+       	else if ((joueur1.MapPosition<joueur2.MapPosition) && (joueur1.ajouer==false) && (joueur2.ajouer==false))
+       	{
+       		action(joueur2);
+       	}
+       	else if ((joueur1.MapPosition==joueur2.MapPosition) && (joueur1.ajouer==false) && (joueur2.ajouer==false))
+       	{
+       		if (joueur1.Position>joueur2.Position)
+       		{
+           		action(joueur1);          		
+       		}
+       		else if (joueur1.Position<joueur2.Position)
+       		{	
+           		action(joueur2);
+       		}
+       		else if (joueur1.Position==joueur2.Position)
+       		{
+       			int alea = (int) Math.random();
+       			if (alea==0)
+       			{
+       				action(joueur1);
+       			}
+       			else
+       			{
+       				action(joueur2);
+       			}
+       		}
+       	}
+       	else if ((joueur1.ajouer==true) && (joueur2.ajouer==false))
+       	{
+       		action(joueur2);
+       	}
+       	else if ((joueur1.ajouer==false) && (joueur2.ajouer==true))
+       	{
+       		action(joueur1);
+       	}
+       	else if ((joueur1.ajouer==true) && (joueur2.ajouer==true))
+       	{
+       		joueur1.ajouer = false;
+       		joueur2.ajouer = false;
+       	}
+    }
+    
+    public static void action(Player joueur)
+    {
+    	if (StdDraw.isKeyPressed(KeyEvent.VK_DOWN))
+    	{
+     		joueur.down();
+     		phase.PerteOxygen(1+joueur.Inventory.size());
+	   		joueur.ajouer = true;
+	    }
+    	if (StdDraw.isKeyPressed(KeyEvent.VK_UP))
+	   	{
+       		joueur.up();
+	       	phase.PerteOxygen(1+joueur.Inventory.size());
+     		joueur.ajouer = true;
+	  	}
+	   	if ((StdDraw.isKeyPressed(KeyEvent.VK_SPACE)) && (!carte[joueur.MapPosition].layer[joueur.Position].drop.isEmpty()))
+	   	{
+	       	joueur.take();
+	       	phase.PerteOxygen(1);
+      		joueur.ajouer = true;
+	  	}
+    }
+}
